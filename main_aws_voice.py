@@ -1,0 +1,164 @@
+import boto3
+import json
+import moviepy.editor as mp
+from moviepy.video.VideoClip import TextClip
+from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
+from moviepy.config import change_settings
+change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.0-Q16-HDRI\\magick.exe"})
+
+
+def make_ssml(input_text):
+    """
+    Replaces certain characters in the input text with their corresponding SSML representation.
+    """
+    return "<speak>" + input_text.replace('&', '&amp;').replace("'", '&apos;') + "</speak>"
+
+def ssml_to_normal_text(input_text):
+    """
+    Replaces certain characters in the input text with their corresponding SSML representation.
+    """
+    return input_text.replace('&amp;', '&').replace('&apos;',"'") .replace("</speak>", "").replace("<speak", "")
+
+def remove_text_occurrences(input_text, to_remove):
+    """
+    Removes all occurrences of the 'to_remove' text from the 'text' string.
+    """
+    return input_text.replace(to_remove, '')
+# Create a client for Amazon Polly
+
+polly_client = boto3.client('polly', region_name='us-east-1')
+# Create a video file object
+
+video = mp.VideoFileClip("the-view-of-new-york.mp4")
+# Create an empty audio file object
+
+audio = mp.AudioFileClip("the-view-of-new-york.mp4")
+# Set the text to be read by Amazon Polly
+
+with open('input.txt', 'r') as file:
+    text = file.read()
+# Set the voice for the Amazon Polly text-to-speech
+
+voice = "Joanna"
+# Set the timestamp for the text to be spoken
+
+timestamp = "00:00:05"
+
+
+def get_speech_marks(input_text):
+
+    # Use Polly Speech Mark to get the timing of each word spoken
+    response = polly_client.synthesize_speech(Engine='standard',
+                                              Text=ssml_text,
+                                              TextType='ssml',
+                                              LanguageCode='en-US',
+                                              VoiceId=voice,
+                                              OutputFormat='json',
+                                              SpeechMarkTypes=["sentence"])
+    # Get the json data from the response
+    speech_marks_from_response = response['AudioStream']._raw_stream.data.decode("utf-8")
+    print(speech_marks_from_response)
+    f = open("speechmarks.txt", "a")
+    f.write(speech_marks_from_response)
+    f.close()
+
+
+text = text.replace('<speak>', '')
+text = text.replace('</speak>', '')
+ssml_text = make_ssml(text)
+#get_speech_marks(ssml_text)  <--------- UNCOMMENT THIS TO ACTUALLY CALL POLLY SPEECH MARKS
+
+with open('speechmarks.txt', 'r') as file:
+    speech_marks = [json.loads(line) for line in file]
+
+
+# Create an empty list to store the timestamps and words
+
+# WHAT IS PYDUBBBB???
+# # Load the MP3 audio into PyDub
+# audio = AudioSegment.from_file(io.BytesIO(response['AudioStream'].read()), format='mp3')
+
+# # Parse the json data to get the timestamps and words
+# for item in speech_data['speechMarkTypes']['word']:
+#     timestamps.append((item['time'], item['value']))
+#
+# # Create an empty text clip
+# subtitles = mp.TextClip("", fontsize=24, color='white')
+#
+# # Set the position and start time of the text clip
+# subtitles = subtitles.set_position('center').set_start(timestamp)
+#
+# # Append the words and timestamps to the text clip
+# for timestamp, word in timestamps:
+#     word_clip = mp.TextClip(word, fontsize=24, color='white')
+#     word_clip = word_clip.set_position('bottom').set_start(timestamp)
+#     subtitles = subtitles.append(word_clip)
+#
+# Synthesize the text to speech using Amazon Polly
+# response_audio = polly_client.synthesize_speech(Text=text, VoiceId=voice, OutputFormat="mp3")
+#timestamps = []
+
+
+def get_mp3(ssml_text):
+    global response_audio
+    response_audio = polly_client.synthesize_speech(Engine='standard',
+                                                    Text=ssml_text,
+                                                    TextType='ssml',
+                                                    LanguageCode='en-US',
+                                                    VoiceId=voice,
+                                                    OutputFormat='mp3')
+
+
+#get_mp3()        <--------- UNCOMMENT THIS TO ACTUALLY CALL POLLY VOICE
+
+
+# Set the font and color for the text
+font = 'Helvetica-Bold'
+fontsize = 60
+color = 'white'
+
+# Create a list of TextClips for each text segment
+clips = []
+for i in range(len(speech_marks)):
+    if i == 0:
+        start_time = 0
+    else:
+        start_time = speech_marks[i - 1]['time']
+    end_time = speech_marks[i]['time']
+    duration = end_time - start_time
+    text = ssml_to_normal_text(speech_marks[i]['value'])
+    txt_clip = TextClip(text, font=font, fontsize=fontsize, color=color)
+    txt_clip = txt_clip.set_pos('center').set_duration(duration)
+    clips.append(txt_clip)
+
+# Combine the TextClips and the video
+result = CompositeVideoClip([video] + clips)
+
+# # Create an audio file object for the audio generated by Amazon Polly
+polly_audio = mp.AudioFileClip("polly_audio.mp3")
+
+# # Add the audio to the video
+result = result.set_audio(polly_audio)
+
+# Write the result to a new video file
+result.write_videofile("output.mp4", threads = 12, bitrate='8000k', codec='mpeg4', verbose=False)
+#
+# Write the audio data from Amazon Polly to a file
+
+
+#
+# # Overlap the Amazon Polly audio with the video at the specified timestamp
+# audio = mp.CompositeAudioClip([audio.set_start(timestamp), polly_audio])
+#
+# # Overlap the subtitles with the video
+# video = mp.CompositeVideoClip([video, subtitles])
+#
+# # Add the audio to the video
+# final_video = video.set_audio(audio)
+#
+# # Save the final video with the overlapped audio and subtitles
+# final_video.write_videofile("final_video.mp4", codec='libx264')
+#
+#
+# with open("polly_audio.mp3", "wb") as f:
+#     f.write(response_audio['AudioStream'].read())

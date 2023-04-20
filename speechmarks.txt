@@ -1,0 +1,12 @@
+{"time":0,"type":"sentence","start":7,"end":18,"value":"Sure thing!"}
+{"time":1108,"type":"sentence","start":19,"end":138,"value":"So, when we&apos;re trying to figure out how well a country&apos;s economy is doing, we look at a few different things."}
+{"time":7151,"type":"sentence","start":139,"end":238,"value":"One of the main things we look at is something called GDP, which stands for Gross Domestic Product."}
+{"time":12606,"type":"sentence","start":239,"end":371,"value":"Basically, GDP is a measure of how much stuff a country produces in a year - everything from cars and computers to food and clothes."}
+{"time":20622,"type":"sentence","start":380,"end":481,"value":"But here&apos;s the thing: just looking at a country&apos;s GDP doesn&apos;t tell us the whole story."}
+{"time":25549,"type":"sentence","start":482,"end":567,"value":"That&apos;s because some countries have a lot more people living in them than others."}
+{"time":29460,"type":"sentence","start":568,"end":795,"value":"So, if we just look at GDP alone, we might think that a country with a huge population is doing better than a country with a smaller population, even if the people in both countries are producing about the same amount of stuff."}
+{"time":42551,"type":"sentence","start":804,"end":882,"value":"That&apos;s where GDP <emphasis level=\"strong\">per capita<\/emphasis> comes in."}
+{"time":45279,"type":"sentence","start":883,"end":978,"value":"GDP per capita is just the total GDP of a country divided by the number of people living there."}
+{"time":51217,"type":"sentence","start":979,"end":1077,"value":"So, it gives us a better idea of how much each person in a country is contributing to the economy."}
+{"time":56931,"type":"sentence","start":1078,"end":1239,"value":"If a country has a high GDP per capita, that means each person in that country is producing a lot of stuff, which could mean they&apos;re better off financially."}
+{"time":65874,"type":"sentence","start":1248,"end":1411,"value":"So, when we&apos;re talking about how well a country&apos;s economy is doing in everyday language, we usually focus more on GDP per capita than just plain old GDP."}
